@@ -11,6 +11,10 @@ The code and data contained in this repository replicates the analysis in
 * `Data`: contains preprocessed data
 * `Analysis`: contains a Jupyter notebook file to run the econometric analysis, as well as notes on data sources and preprocessing
 
+### Python environment: 
+* Recommended python version: 3.14
+* Please install dependencies using requirements.txt
+
 ## License
 
 The code in this repo is MIT licensed, see `./LICENSE.txt`.
