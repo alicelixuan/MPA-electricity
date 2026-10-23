@@ -13,7 +13,7 @@ The code and data contained in this repository replicates the analysis in
 
 ### Python environment: 
 * Recommended python version: 3.14
-* Please install dependencies using requirements.txt
+* Please install dependencies using requirements.txt within the `Analysis` folder
 
 ## License
 
