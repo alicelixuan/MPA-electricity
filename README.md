@@ -16,16 +16,6 @@ jupyter notebook replicate.ipynb                            # Run All; or: pytho
 The run takes about one minute (tested with Python 3.14.6 on Linux). It creates `output/paper/` with every figure
 (`.png`, `.svg`) and table (`.csv`) of the paper, computed from the stored data, and shows them in the notebook.
 
-## Which code produces which result
-
-| Paper | File in `output/paper/` | Code (`mpa/`) |
-|---|---|---|
-| Figures 1, 2 | – (illustrations, not from data) | – |
-| Figures 3–8, B1, B2 | `Figure_3` … `Figure_8`, `Figure_B1`, `Figure_B2`; data of Figures 8 and B2 in `Figure_8_data.csv`, `Figure_B2_data.csv` | `figures.py`: `fig3` … `figB2` |
-| Tables 1–7, B1–B3, Appendix A | `Table_1.csv` … `Table_7.csv`, `Table_B1.csv` … `Table_B3.csv`, `Table_A.csv` | `tables.py`: `table1` … `tableB3`, `tableA` |
-
-Table 1 also gives the shares of profitable unit-hours reported in Section 5.3.
-
 ## Steps and reruns
 
 `replicate.ipynb` and `replicate.py` call `mpa/pipeline.py`, which runs six steps. By default steps 1–4 are read from
@@ -33,14 +23,14 @@ Table 1 also gives the shares of profitable unit-hours reported in Section 5.3.
 
 | Step | Code | Stored result (`data/stored/`) | Rerun flag | Rerun time |
 |---|---|---|---|---|
-| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` | ~1 s |
+| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` | seconds |
 | 2. Supply-curve fits, hourly slopes | `supply.py` | `supply_fits.csv`, `slopes.parquet` | `RERUN_FITS` | 20–35 min on 2 cores |
 | 3. Monte Carlo dispatch model | `dispatch_model.py` | `dispatch_results.parquet` | `RERUN_DISPATCH_MODEL` | ~13 CPU-s per unit and iteration: ~150 CPU-hours for 1000 iterations |
 | 4. Analysis panel | `panel.py` | `analysis_panel.parquet` | `RERUN_PANEL` | seconds |
 | 5. Logit models | `econometrics.py` | – | always runs | – |
 | 6. Figures and tables | `figures.py`, `tables.py` | – | always runs | ~1 min |
 
-Set the flags in the notebook's first cell, or see `python replicate.py --help`.
+Set the flags in the notebook's first cell.
 
 * **Where reruns go.** A rerun creates `output/rerun/<run>/`, which holds the recomputed intermediate results, all
   figures and tables, and `comparison.md` (rerun vs `output/paper/`). `output/paper/` and `data/` are never
@@ -85,7 +75,7 @@ Sources:
 * Umweltbundesamt (UBA), carbon intensity of fuels:
   https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/23_2024_cc_strommix_11_2024.pdf
 
-## Model variables (`panel.py`)
+## Model variables
 
 Unit *i*, company *j*, hour *h*, month *m*:
 
@@ -107,8 +97,7 @@ Unit *i*, company *j*, hour *h*, month *m*:
 
 ## Requirements
 
-`requirements.txt` (pinned) for the replication; `requirements-model.txt` only for a dispatch model rerun. About
-100 MB of disk for the data.
+`requirements.txt` for the replication; `requirements-model.txt` only for a dispatch model rerun.
 
 ## License
 
