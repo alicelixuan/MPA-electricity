@@ -23,7 +23,7 @@ The run takes about one minute (tested with Python 3.14.6 on Linux). It creates 
 
 | Step | Code | Stored result (`data/stored/`) | Rerun flag | Rerun time |
 |---|---|---|---|---|
-| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` | seconds |
+| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` | ~1 s |
 | 2. Supply-curve fits, hourly slopes | `supply.py` | `supply_fits.csv`, `slopes.parquet` | `RERUN_FITS` | 20–35 min on 2 cores |
 | 3. Monte Carlo dispatch model | `dispatch_model.py` | `dispatch_results.parquet` | `RERUN_DISPATCH_MODEL` | ~13 CPU-s per unit and iteration: ~150 CPU-hours for 1000 iterations |
 | 4. Analysis panel | `panel.py` | `analysis_panel.parquet` | `RERUN_PANEL` | seconds |
@@ -77,23 +77,51 @@ Sources:
 
 ## Model variables
 
-Unit *i*, company *j*, hour *h*, month *m*:
+Indices: unit *i*, company *j*, hour *h*, month *m*. Columns refer to `data/stored/analysis_panel.parquet`.
 
-* **Contribution margin:** $m_{i,h} = p_h - c^{var}_{i,h}$, where $c^{var}_{i,h}$ is the variable cost from the
-  dispatch model, averaged over its iterations:
-  * $c^{var}_{i,h} = (c^{fuel}_h + c^{carbon}_h)/\sigma_i$, with $\sigma_i$ the thermal conversion efficiency;
-  * $c^{carbon}_h$ is the carbon price times 0.201 (gas) or 0.338 (coal) t CO2 per MWh thermal.
-* **Exposure:**
-  * company generation $G_{j,h} = \sum_{i \in j} G_{i,h}$;
-  * hedged quantity $Q^{hedged}_{j,m}$ = $r$ × the mean of $G_{j,h}$ over month *m*, separately for peak and off-peak
-    hours (hedge rate $r = 1$ in the main model);
-  * net exposure $E_{j,h} = G_{j,h} - Q^{hedged}_{j,m}$.
-* **Net profit per MW**, with $\delta_h$ the slope of the supply curve:
-  * withholding: $\pi^{W}_{i,j,h} = \delta_h E_{j,h} - m_{i,h}$;
-  * push-in: $\pi^{P}_{i,j,h} = -\delta_h E_{j,h} + m_{i,h}$.
-* **Competitive benchmark:** $z_{i,h}$ = 1 if the Monte Carlo average of the model state is ≥ 0.95, 0 if ≤ 0.05.
-* **Deviation in dispatch:** $y_{i,h}$ = observed status (generation > 0) − $z_{i,h}$. A value of −1 is set to 0 when
-  the unit is fully unavailable.
+### Input data
+
+| Symbol | Meaning | Column |
+|---|---|---|
+| $`p_h`$ | Day-ahead wholesale electricity price, hour *h* (EUR/MWh) | `price` |
+| $`G_{i,h}`$ | Generation of unit *i*, hour *h* (MW) | `actual_generation_output` |
+| $`k_{i,h}`$ | Available capacity of unit *i*, hour *h* (MW) | `available_capacity` |
+| $`K_i`$ | Installed capacity of unit *i* (MW) | `installed_capacity` |
+| $`\sigma_i`$ | Thermal conversion efficiency of unit *i* | `efficiency` (`data/inputs/unit_parameters.csv`) |
+| $`c^{fuel}_h + c^{carbon}_h`$ | Carbon-adjusted fuel cost, hour *h* (EUR/MWh thermal): coal CIF ARA, gas TTF or lignite, plus the EU ETS price times the fuel's carbon intensity | `Clean Coal`, `Clean Gas`, `Clean Lignite [EUR/MWh]` (`data/inputs/fuel_costs_hourly.csv.gz`) |
+| $`\delta_h`$ | Slope of the market supply curve, hour *h* (EUR/MWh per MW) | `slope` |
+| $`\bar d_{i,h}`$ | Competitive dispatch state, average over Monte Carlo iterations, in [0, 1] | `state` (`data/stored/dispatch_results.parquet`) |
+| $`z_{i,h}`$ | Competitive dispatch status, discretized | `competitive_dispatch_status_discretized` |
+| $`y_{i,h}`$ | Deviation in dispatch, discretized | `deviation_discretized` |
+| $`r`$ | Hedge rate: 1 in the main model; 0.7 and 0 in Table 6 | parameter (`econometrics.HEDGE_RATES`) |
+
+### Model variables derived from the inputs
+
+| Symbol | Meaning | Column |
+|---|---|---|
+| $`m_{i,h}`$ | Contribution margin (EUR/MWh) | `margin` |
+| $`G_{j,h}`$ | Generation of company *j* (MW) | `company_gen` |
+| $`Q^{hedged}_{j,m}`$ | Quantity hedged by company *j* for month *m* (MW) | `hedged_quantity` |
+| $`E_{j,h}`$ | Net exposure of company *j* to the spot price (MW) | `net_exposure` |
+| $`\pi^{W}_{i,j,h}`$ | Net profit from withholding 1 MW (EUR/MW) | `net_profit_withhold_marginal` |
+| $`\pi^{P}_{i,j,h}`$ | Net profit from pushing in 1 MW (EUR/MW) | `net_profit_pushin_marginal` |
+
+### Transformations
+
+* **Contribution margin:** $`m_{i,h} = p_h - c^{var}_{i,h}`$, with variable cost
+  $`c^{var}_{i,h} = (c^{fuel}_h + c^{carbon}_h)/\sigma_i`$, averaged over the Monte Carlo iterations of the dispatch
+  model. The carbon cost is $`c^{carbon}_h = Carbon_h \cdot 0.201`$ for gas-fired units and
+  $`Carbon_h \cdot 0.338`$ for coal-fired units.
+* **Company generation:** $`G_{j,h} = \sum_{i \in j} G_{i,h}`$, including the company's CHP units.
+* **Hedged quantity:** $`Q^{hedged}_{j,m} = r \cdot \frac{1}{H}\sum_{h \in H} G_{j,h}`$, where *H* is the number of
+  hours in month *m*, computed separately for peak and off-peak hours.
+* **Net exposure:** $`E_{j,h} = G_{j,h} - Q^{hedged}_{j,m}`$.
+* **Net profit from withholding 1 MW:** $`\pi^{W}_{i,j,h} = \delta_h E_{j,h} - m_{i,h}`$.
+* **Net profit from pushing in 1 MW:** $`\pi^{P}_{i,j,h} = -\delta_h E_{j,h} + m_{i,h}`$.
+* **Competitive dispatch status:** $`z_{i,h} = 1`$ if $`\bar d_{i,h} \ge 0.95`$, and $`z_{i,h} = 0`$ if
+  $`\bar d_{i,h} \le 0.05`$. Other hours are left out of the models.
+* **Deviation in dispatch:** $`y_{i,h} = \mathbb{1}[G_{i,h} > 0] - z_{i,h}`$, with $`y_{i,h} = 0`$ instead of −1 when
+  $`k_{i,h} = 0`$, because an outage is not withholding.
 
 ## Requirements
 
