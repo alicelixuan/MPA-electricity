@@ -1,0 +1,41 @@
+EIC,UnitName,production_type,installed_capacity_model,efficiency
+11WD7NEUR1B--B-X,Neurath B,Fossil Brown coal/Lignite,294.0,0.3328
+11WD7NEUR1B--C-U,Neurath C,Fossil Brown coal/Lignite,294.0,0.3352
+11WD7NEUR1B--F-L,Neurath F,Fossil Brown coal/Lignite,1060.0,0.4288
+11WD7NEUR1B--G-I,Neurath G,Fossil Brown coal/Lignite,1060.0,0.4288
+11WD7NEUR2B--A-T,Neurath A,Fossil Brown coal/Lignite,294.0,0.3328
+11WD7WEIS1B--F-M,Weisweiler F,Fossil Brown coal/Lignite,321.0,0.3208
+11WD7WEIS5B--E-Y,Weisweiler E,Fossil Brown coal/Lignite,321.0,0.316
+11WD8BOXB1L---R0,KW Boxberg Block R,Fossil Brown coal/Lignite,630.0,0.4288
+11WD2BRE4000115K,KW Mittelsbueren Block 4,Fossil Gas gas/steam turbine,176.0,0.45
+11WD2GE2D000056A,Franken I Block 2 + GT,Fossil Gas Combined cycle,440.0,0.432
+11WD2GEB1000055R,Franken I Block 1,Fossil Gas Combined cycle,383.0,0.4185
+11WD2GKBK000335V,GKB Mittelsbueren GuD,Fossil Gas Combined cycle,450.0,0.61
+11WD2HUNT0000644,Huntorf GT,Fossil Gas gas/steam turbine,321.0,0.3956
+11WD2IRG4000061X,Irsching 4,Fossil Gas Combined cycle,561.0,0.5895
+11WD7GERS-G-BLIY,Gersteinwerk I,Fossil Gas gas/steam turbine,410.0,0.3553
+11WD7GERS5S-K1-J,Gersteinwerk K1,Fossil Gas gas/steam turbine,112.0,0.3384
+11WD7HERD2G-H6-X,HERDECKE_H6,Fossil Gas Combined cycle,424.0,0.5715
+11WD7KWHU1GBL10E,KW Hamm-Uentrop Block 10,Fossil Gas Combined cycle,425.0,0.576
+11WD7KWHU1GBL20B,KW Hamm-Uentrop Block 20,Fossil Gas Combined cycle,425.0,0.576
+11WD7KWKN-20-EEW,Knapsack 2,Fossil Gas Combined cycle,426.0,0.5985
+11WD7KWKN-KW-EEN,Knapsack 1,Fossil Gas Combined cycle,784.0,0.5715
+11WD7NORF5GGUDFA,Block F,Fossil Gas Combined cycle,595.0,0.61
+11WD7OPLA1G--318,NIEHL-3,Fossil Gas gas/steam turbine,453.0,0.45
+11WD7WEIS5GVGTGU,Weisweiler VGT - BI. G,Fossil Gas gas/steam turbine,200.0,0.3956
+11WD7WEIS5GVGTHS,Weisweiler VGT - BI. H,Fossil Gas gas/steam turbine,200.0,0.3956
+11W0-0000-0004-B,GKM AG DBEnergie,Fossil Hard coal,254.0,0.46
+11W0-0000-0005-8,GKM AG TNG,Fossil Hard coal,1037.3,0.46
+11W0-0000-0006-5,GKM AG Amprion,Fossil Hard coal,691.7,0.46
+11WD2FARG0001262,DEFARGE____1_____,Fossil Hard coal,350.0,0.4425
+11WD2HEY40000638,Heyden,Fossil Hard coal,875.0,0.3925
+11WD2MEHR2CSWHCZ,KW Mehrum Block 3,Fossil Hard coal,690.0,0.4325
+11WD2WIL10000688,Wilhelmshaven,Fossil Hard coal,757.0,0.365
+11WD2WILH0001255,DEWHV______1_____ ,Fossil Hard coal,726.0,0.4625
+11WD7BERG1S--A-X,Bergkamen Block A,Fossil Hard coal,717.0,0.3775
+11WD7MITB1C---A1,Bexbach Block 1,Fossil Hard coal,726.0,0.3825
+11WD7WSFN1S--E-Z,Westfalen E,Fossil Hard coal,780.0,0.46
+11W0-0000-0163-M,Küstenkraftwerk,Fossil Gas gas/steam turbine,190.4,0.45
+11W0-0000-0044-W,Datteln 4,Fossil Hard coal,1052.0,0.46
+11WD7NIED2B--E-B,Niederaußem E,Fossil Brown coal/Lignite,300.0,0.328
+11W0-0000-0467-W,Scholven 1,Fossil Gas gas/steam turbine,138.0,0.45
