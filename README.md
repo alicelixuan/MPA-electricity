@@ -21,27 +21,26 @@ The run takes about one minute (tested with Python 3.14.6 on Linux). It creates 
 `replicate.ipynb` and `replicate.py` call `mpa/pipeline.py`, which runs six steps. By default steps 1–4 are read from
 `data/stored/`. A rerun flag recomputes that step and every step after it.
 
-| Step | Code | Stored result (`data/stored/`) | Rerun flag | Rerun time |
-|---|---|---|---|---|
-| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` | ~1 s |
-| 2. Supply-curve fits, hourly slopes | `supply.py` | `supply_fits.csv`, `slopes.parquet` | `RERUN_FITS` | 20–35 min on 2 cores |
-| 3. Monte Carlo dispatch model | `dispatch_model.py` | `dispatch_results.parquet` | `RERUN_DISPATCH_MODEL` | ~13 CPU-s per unit and iteration: ~150 CPU-hours for 1000 iterations |
-| 4. Analysis panel | `panel.py` | `analysis_panel.parquet` | `RERUN_PANEL` | seconds |
-| 5. Logit models | `econometrics.py` | – | always runs | – |
-| 6. Figures and tables | `figures.py`, `tables.py` | – | always runs | ~1 min |
+| Step | Code | Stored result (`data/stored/`) | Rerun flag |
+|---|---|---|---|
+| 1. Supply regimes (PELT, 11 regimes) | `supply.py` | `change_points.json` | `RERUN_REGIMES` |
+| 2. Supply-curve fits, hourly slopes | `supply.py` | `supply_fits.csv`, `slopes.parquet` | `RERUN_FITS` |
+| 3. Monte Carlo dispatch model | `dispatch_model.py` | `dispatch_results.parquet` | `RERUN_DISPATCH_MODEL` |
+| 4. Analysis panel | `panel.py` | `analysis_panel.parquet` | `RERUN_PANEL` |
+| 5. Logit models | `econometrics.py` | – | always runs |
+| 6. Figures and tables | `figures.py`, `tables.py` | – | always runs |
 
 Set the flags in the notebook's first cell.
 
-* **Where reruns go.** A rerun creates `output/rerun/<run>/`, which holds the recomputed intermediate results, all
+* **Rerun pipeline.** A rerun creates `output/rerun/<run>/`, which holds the recomputed intermediate results, all
   figures and tables, and `comparison.md` (rerun vs `output/paper/`). `output/paper/` and `data/` are never
   overwritten.
 * **Dispatch model.** A rerun needs `pip install -r requirements-model.txt` and a solver.
   * Solver: GLPK, as in the original runs (`apt install glpk-utils` or `conda install -c conda-forge glpk`), or HiGHS
     (`SOLVER = "appsi_highs"`).
-  * Speed and size: `N_JOBS` sets the number of parallel processes. `DISPATCH_UNITS` reruns only some units; the other
-    unit-hours keep the stored results.
-* **Randomness.** The fits and the dispatch model are seeded (`SEED = 2024`), so a rerun is repeatable. The stored
-  results come from unseeded original runs, so a rerun gets close to them but does not match them exactly.
+  * Speed and size: `N_JOBS` sets the number of parallel processes. `DISPATCH_UNITS` sets rerun units; stored results are used when not rerun.
+* **Stochasticity.** The fits and the dispatch model are seeded (`SEED = 2024`), so a rerun is repeatable. The stored
+  results come from unseeded original runs, so a rerun gets close to them but does not provide an exact match.
   * Refitted hourly slopes agree with the paper's within 1e-4 in 98 % of hours; all R² agree to four decimals.
   * A 10-iteration dispatch rerun of all 40 units correlates 0.99 with the stored 1000-iteration results (state and
     dispatch).
