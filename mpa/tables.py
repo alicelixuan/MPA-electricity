@@ -94,7 +94,7 @@ def table4(df):
 
 
 def table5(df):
-    return _logit_rows(em.regime_switching_logit(df, (em.WITHHOLD, *REDISPATCH), (em.PUSHIN, *REDISPATCH)), LABELS)
+    return _logit_rows(em.regime_switching_logit(df, (em.WITHHOLD, *REDISPATCH), (em.PUSHIN, *REDISPATCH), method="newton"), LABELS)
 
 
 def table6(df, main):
